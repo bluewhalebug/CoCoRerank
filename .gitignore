@@ -1,0 +1,36 @@
+# Local tooling and credentials
+.agents/
+.codex/
+.env
+.env.*
+!.env.example
+
+# Python environments and caches
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.ipynb_checkpoints/
+*.egg-info/
+build/
+dist/
+
+# Experiment outputs and model artifacts
+checkpoints/
+outputs/
+results/
+wandb/
+wandb_runs/
+*.pt
+*.pth
+*.ckpt
+*.log
+
+# Editor and operating-system files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
