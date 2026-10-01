@@ -12,9 +12,9 @@ type(scope): subject
 The repository covers dataset normalization and semantic screening, NNGen-style
 retrieval, two-stage training of the consistency scorer, cluster-aware
 reranking, and evaluation. The prompts used for LLM-assisted semantic quality
-assessment, candidate generation, and hard-negative generation are reported in
-the paper appendix. The corresponding LLM-serving code is therefore not
-duplicated in this repository.
+assessment, candidate generation, subject-only generation, and hard-negative
+generation are provided under `prompt/`. The corresponding LLM-serving code is
+not included in this repository.
 
 ## Directory structure
 
@@ -29,6 +29,11 @@ CoCoRerank/
 ├── dataset_filter/
 │   ├── clean.py                       # Structural normalization
 │   └── embedding_noise_filter.py      # Embedding-based semantic screening
+├── prompt/
+│   ├── quality_assessment.md           # Semantic quality assessment prompt
+│   ├── candidate_generation.md         # CCS candidate-generation prompt
+│   ├── subject_only.md                 # Subject-only generation prompt
+│   └── hard_negative.md                # Hard-negative generation prompt
 ├── retrieval/                          # NNGen-style retrieval
 │   ├── build_icl_index.py
 │   └── nngen_retriever.py
@@ -163,10 +168,11 @@ The output directory contains:
 Instead of a fixed threshold, `--top-ratio` or `--top-k` can select the lowest
 scoring samples. In the paper's pipeline, low-scoring or unscorable records are
 then assessed by an LLM for accuracy, specificity, conciseness, and
-completeness; the prompt is given in the appendix. That LLM call is not included
-here. As described in the paper, LLM scores above 6 are retained. The resulting
-dataset contains 86,688 commit-message pairs and is stratified by commit type
-into training, retrieval, validation, and test partitions with a 6:2:1:1 ratio.
+completeness using `prompt/quality_assessment.md`. The LLM-serving call is not
+included here. As described in the paper, LLM scores above 6 are retained. The
+resulting dataset contains 86,688 commit-message pairs and is stratified by
+commit type into training, retrieval, validation, and test partitions with a
+6:2:1:1 ratio.
 
 ## 2. Retrieval for in-context examples
 
@@ -202,9 +208,10 @@ sentence BLEU. An optional total token budget can be supplied with
 `--max_tokens`; pass a local tokenizer via `--tokenizer_path` for model-specific
 token counts.
 
-The LLM candidate-generation prompt is provided in the paper appendix. In the
-experiments, the generator produces 100 CCS-compliant candidates per test
-instance.
+The LLM candidate-generation prompt is provided in
+`prompt/candidate_generation.md`. The subject-only variant is provided in
+`prompt/subject_only.md`. In the experiments, the generator produces 100
+CCS-compliant candidates per test instance.
 
 ## 3. Train the consistency scorer
 
@@ -250,9 +257,9 @@ Hard-stage rows extend the base format with LLM-generated hard negatives:
 }
 ```
 
-The hard-negative generation prompt is included in the paper appendix; its LLM
-serving code is not included here. After generating the hard-negative training
-and validation files, continue from the best easy-stage checkpoint:
+The hard-negative generation prompt is provided in `prompt/hard_negative.md`;
+its LLM-serving code is not included here. After generating the hard-negative
+training and validation files, continue from the best easy-stage checkpoint:
 
 ```bash
 MODEL_NAME=/path/to/encoder \
