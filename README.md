@@ -59,11 +59,10 @@ CoCoRerank/
 
 ### Download JSONL files for the scripts in this repository
 
-Clone the code with Git LFS automatic downloads disabled, then download the
-dataset from Hugging Face. Git LFS is not required for this workflow:
+Clone the code, then download the dataset from Hugging Face:
 
 ```bash
-GIT_LFS_SKIP_SMUDGE=1 git clone https://github.com/bluewhalebug/CoCoRerank.git
+git clone https://github.com/bluewhalebug/CoCoRerank.git
 cd CoCoRerank
 
 pip install --upgrade huggingface_hub
@@ -74,9 +73,9 @@ hf download jiakechong/CoCoRerank \
 ```
 
 If you already cloned the repository, run the installation and `hf download`
-commands from the repository root. The download writes all four JSONL files to
-`data/`, replacing any Git LFS pointer files at those paths. These paths match
-the retrieval, training, and evaluation commands below. You can also download
+commands from the repository root. The download creates `data/` and saves all
+four JSONL files there. These paths match the retrieval, training, and
+evaluation commands below. You can also download
 the files manually from the
 [Hugging Face file browser](https://huggingface.co/datasets/jiakechong/CoCoRerank/tree/main/data)
 and place them in `data/`.
