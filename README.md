@@ -1,8 +1,10 @@
 # CoCoRerank
 
-This repository contains the code and dataset accompanying the paper
+This repository contains the code accompanying the paper
 **“CoCoRerank: Towards Conventional Commit Message Generation by Component and
 Candidate Consistency Reranking.”** 
+The dataset is available on the Hugging Face Hub at
+[jiakechong/CoCoRerank](https://huggingface.co/datasets/jiakechong/CoCoRerank).
 
 CoCoRerank targets commit messages that follow the Conventional Commits
 Specification (CCS):
@@ -21,7 +23,7 @@ not included in this repository.
 ```text
 CoCoRerank/
 ├── README.md
-├── data/
+├── data/                             # Dataset files downloaded from Hugging Face
 │   ├── train_set.jsonl                # Training split (52,011 samples)
 │   ├── retrieval_set.jsonl            # Retrieval split (17,337 samples)
 │   ├── val_set.jsonl                  # Validation split (8,670 samples)
@@ -53,16 +55,56 @@ CoCoRerank/
 ```
 
 
-## Download
+## Download and load the dataset
 
-The dataset files are stored with Git LFS. Install Git LFS before cloning:
+### Download JSONL files for the scripts in this repository
+
+Clone the code with Git LFS automatic downloads disabled, then download the
+dataset from Hugging Face. Git LFS is not required for this workflow:
 
 ```bash
-git lfs install
-git clone https://github.com/bluewhalebug/CoCoRerank.git
+GIT_LFS_SKIP_SMUDGE=1 git clone https://github.com/bluewhalebug/CoCoRerank.git
 cd CoCoRerank
-git lfs pull
+
+pip install --upgrade huggingface_hub
+hf download jiakechong/CoCoRerank \
+  --repo-type dataset \
+  --include "data/*.jsonl" \
+  --local-dir .
 ```
+
+If you already cloned the repository, run the installation and `hf download`
+commands from the repository root. The download writes all four JSONL files to
+`data/`, replacing any Git LFS pointer files at those paths. These paths match
+the retrieval, training, and evaluation commands below. You can also download
+the files manually from the
+[Hugging Face file browser](https://huggingface.co/datasets/jiakechong/CoCoRerank/tree/main/data)
+and place them in `data/`.
+
+### Load with Hugging Face Datasets
+
+For Python access through the `datasets` library:
+
+```bash
+pip install --upgrade datasets
+```
+
+```python
+from datasets import load_dataset
+
+dataset = load_dataset("jiakechong/CoCoRerank")
+train = dataset["train"]
+retrieval = dataset["retrieval"]
+validation = dataset["validation"]
+test = dataset["test"]
+
+print(train[0])
+```
+
+The Hub configuration defines the four splits, including `validation` for
+`val_set.jsonl`. `load_dataset` uses the Hugging Face cache; it does not create
+the local `data/*.jsonl` files expected by this repository's scripts. Use the
+JSONL download workflow above when running those scripts.
 
 ## Environment
 
@@ -96,11 +138,17 @@ cd CoCoRerank
 
 ## Data format
 
-The repository includes all four partitions of the dataset (86,688
-samples): `data/train_set.jsonl` (52,011), `data/retrieval_set.jsonl` (17,337),
-`data/val_set.jsonl` (8,670), and `data/test_set.jsonl` (8,670). The training and
-validation splits support easy-stage retraining, the retrieval split supplies
-in-context examples, and the test split supports evaluation. Hard-stage
+The Hugging Face dataset provides four partitions totaling 86,688 samples:
+
+| Hugging Face split | Local JSONL path after download | Samples |
+|---|---|---:|
+| `train` | `data/train_set.jsonl` | 52,011 |
+| `retrieval` | `data/retrieval_set.jsonl` | 17,337 |
+| `validation` | `data/val_set.jsonl` | 8,670 |
+| `test` | `data/test_set.jsonl` | 8,670 |
+
+The training and validation splits support easy-stage retraining, the retrieval
+split supplies in-context examples, and the test split supports evaluation. Hard-stage
 training still requires separately generated hard negatives, and model-based
 evaluation requires encoder weights, trained checkpoints, and generated
 candidates.
@@ -414,6 +462,7 @@ arguments shown above.
 - The metric wrappers are included under `evaluate/local_metrics`. The METEOR
   1.5 runtime assets are supplied by the pinned `pycocoevalcap==1.2`
   dependency.
-- All four dataset splits are included. Pretrained model weights, trained
-  checkpoints, generated candidates, hard negatives, and LLM-serving code are
-  not included in this repository.
+- All four dataset splits are available on
+  [Hugging Face](https://huggingface.co/datasets/jiakechong/CoCoRerank).
+  Pretrained model weights, trained checkpoints, generated candidates, hard
+  negatives, and LLM-serving code are not included in this repository.
